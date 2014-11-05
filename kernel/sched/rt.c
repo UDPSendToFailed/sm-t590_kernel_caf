@@ -1527,9 +1527,6 @@ select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 	struct rq *rq;
 	bool may_not_preempt;
 
-	if (p->nr_cpus_allowed == 1)
-		goto out;
-
 	if (sched_enable_hmp)
 		return select_task_rq_rt_hmp(p, cpu, sd_flag, flags);
 
