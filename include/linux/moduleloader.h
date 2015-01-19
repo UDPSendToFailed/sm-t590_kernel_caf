@@ -89,4 +89,6 @@ void module_arch_cleanup(struct module *mod);
 #define MODULE_ALIGN PAGE_SIZE
 #endif
 
+/* Any cleanup before freeing mod->module_init */
+void module_arch_freeing_init(struct module *mod);
 #endif
