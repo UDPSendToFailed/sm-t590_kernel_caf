@@ -1965,7 +1965,7 @@ static void free_module(struct module *mod)
 	/* This may be NULL, but that's OK */
 	unset_module_init_ro_nx(mod);
 	module_arch_freeing_init(mod);
-	module_free(mod, mod->module_init);
+	module_memfree(mod->module_init);
 	kfree(mod->args);
 	percpu_modfree(mod);
 
@@ -3336,8 +3336,8 @@ static void module_deallocate(struct module *mod, struct load_info *info)
 {
 	percpu_modfree(mod);
 	module_arch_freeing_init(mod);
-	module_free(mod, mod->module_init);
-	module_free(mod, mod->module_core);
+	module_memfree(mod->module_init);
+	module_memfree(mod->module_core);
 }
 
 int __weak module_finalize(const Elf_Ehdr *hdr,
@@ -3601,7 +3601,7 @@ static int do_init_module(struct module *mod)
 #endif
 	unset_module_init_ro_nx(mod);
 	module_arch_freeing_init(mod);
-	module_free(mod, mod->module_init);
+	module_memfree(mod->module_init);
 	mod->module_init = NULL;
 	mod->init_size = 0;
 	mod->init_ro_size = 0;
