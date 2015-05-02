@@ -2032,12 +2032,6 @@ static int selinux_binder_transfer_file(struct task_struct *from, struct task_st
 static int selinux_ptrace_access_check(struct task_struct *child,
 				     unsigned int mode)
 {
-	int rc;
-
-	rc = cap_ptrace_access_check(child, mode);
-	if (rc)
-		return rc;
-
 	if (mode & PTRACE_MODE_READ) {
 		u32 sid = current_sid();
 		u32 csid = task_sid(child);
@@ -2049,24 +2043,12 @@ static int selinux_ptrace_access_check(struct task_struct *child,
 
 static int selinux_ptrace_traceme(struct task_struct *parent)
 {
-	int rc;
-
-	rc = cap_ptrace_traceme(parent);
-	if (rc)
-		return rc;
-
 	return task_has_perm(parent, current, PROCESS__PTRACE);
 }
 
 static int selinux_capget(struct task_struct *target, kernel_cap_t *effective,
 			  kernel_cap_t *inheritable, kernel_cap_t *permitted)
 {
-	int error;
-
-	error = current_has_perm(target, PROCESS__GETCAP);
-	if (error)
-		return error;
-
 	return cap_capget(target, effective, inheritable, permitted);
 }
 
@@ -2075,13 +2057,6 @@ static int selinux_capset(struct cred *new, const struct cred *old,
 			  const kernel_cap_t *inheritable,
 			  const kernel_cap_t *permitted)
 {
-	int error;
-
-	error = cap_capset(new, old,
-				      effective, inheritable, permitted);
-	if (error)
-		return error;
-
 	return cred_has_perm(old, new, PROCESS__SETCAP);
 }
 
@@ -2100,11 +2075,7 @@ static int selinux_capable(const struct cred *cred, struct user_namespace *ns,
 {
 	int rc;
 
-	rc = cap_capable(cred, ns, cap, audit);
-	if (rc)
-		return rc;
-
-	return cred_has_capability(cred, cap, audit);
+	return cred_has_capability(cred, cap, audit, ns == &init_user_ns);
 }
 
 static int selinux_quotactl(int cmds, int type, int id, struct super_block *sb)
@@ -2186,7 +2157,7 @@ static int selinux_vm_enough_memory(struct mm_struct *mm, long pages)
 	if (rc == 0)
 		cap_sys_admin = 1;
 
-	return __vm_enough_memory(mm, pages, cap_sys_admin);
+	return cap_sys_admin;
 }
 
 /* binprm security operations */
@@ -2256,10 +2227,6 @@ static int selinux_bprm_set_creds(struct linux_binprm *bprm)
 	struct common_audit_data ad;
 	struct inode *inode = file_inode(bprm->file);
 	int rc;
-
-	rc = cap_bprm_set_creds(bprm);
-	if (rc)
-		return rc;
 
 	/* SELinux context only depends on initial program or script and not
 	 * the script interpreter */
@@ -2384,7 +2351,7 @@ static int selinux_bprm_secureexec(struct linux_binprm *bprm)
 					PROCESS__NOATSECURE, NULL);
 	}
 
-	return (atsecure || cap_bprm_secureexec(bprm));
+	return !!atsecure;
 }
 
 static int match_file(const void *p, struct file *file, unsigned fd)
@@ -3238,8 +3205,11 @@ static int selinux_inode_getsecurity(const struct inode *inode, const char *name
 	 * and lack of permission just means that we fall back to the
 	 * in-core context value, not a denial.
 	 */
-	error = selinux_capable(current_cred(), &init_user_ns, CAP_MAC_ADMIN,
-				SECURITY_CAP_NOAUDIT);
+	error = cap_capable(current_cred(), &init_user_ns, CAP_MAC_ADMIN,
+			    SECURITY_CAP_NOAUDIT);
+	if (!error)
+		error = cred_has_capability(current_cred(), CAP_MAC_ADMIN,
+					    SECURITY_CAP_NOAUDIT);
 	if (!error)
 		error = security_sid_to_context_force(isec->sid, &context,
 						      &size);
@@ -3464,12 +3434,7 @@ error:
 
 static int selinux_mmap_addr(unsigned long addr)
 {
-	int rc;
-
-	/* do DAC check on address space usage */
-	rc = cap_mmap_addr(addr);
-	if (rc)
-		return rc;
+	int rc = 0;
 
 	if (addr < CONFIG_LSM_MMAP_MIN_ADDR) {
 		u32 sid = current_sid();
@@ -3817,23 +3782,11 @@ static void selinux_task_getsecid(struct task_struct *p, u32 *secid)
 
 static int selinux_task_setnice(struct task_struct *p, int nice)
 {
-	int rc;
-
-	rc = cap_task_setnice(p, nice);
-	if (rc)
-		return rc;
-
 	return current_has_perm(p, PROCESS__SETSCHED);
 }
 
 static int selinux_task_setioprio(struct task_struct *p, int ioprio)
 {
-	int rc;
-
-	rc = cap_task_setioprio(p, ioprio);
-	if (rc)
-		return rc;
-
 	return current_has_perm(p, PROCESS__SETSCHED);
 }
 
@@ -3859,12 +3812,6 @@ static int selinux_task_setrlimit(struct task_struct *p, unsigned int resource,
 
 static int selinux_task_setscheduler(struct task_struct *p)
 {
-	int rc;
-
-	rc = cap_task_setscheduler(p);
-	if (rc)
-		return rc;
-
 	return current_has_perm(p, PROCESS__SETSCHED);
 }
 
@@ -5318,12 +5265,6 @@ static unsigned int selinux_ipv6_postroute(const struct nf_hook_ops *ops,
 
 static int selinux_netlink_send(struct sock *sk, struct sk_buff *skb)
 {
-	int err;
-
-	err = cap_netlink_send(sk, skb);
-	if (err)
-		return err;
-
 	return selinux_nlmsg_perm(sk, skb);
 }
 
@@ -6269,7 +6210,7 @@ static struct security_hook_list selinux_hooks[] = {
 
 static __init int selinux_init(void)
 {
-	if (!security_module_enable(&selinux_ops)) {
+	if (!security_module_enable("selinux")) {
 // [ SEC_SELINUX_PORTING_COMMON
 #ifdef CONFIG_ALWAYS_ENFORCE
 		selinux_enabled = 1;
@@ -6297,8 +6238,7 @@ static __init int selinux_init(void)
 					    0, SLAB_PANIC, NULL);
 	avc_init();
 
-	if (register_security(&selinux_ops))
-		panic("SELinux: Unable to register with kernel.\n");
+	security_add_hooks(selinux_hooks, ARRAY_SIZE(selinux_hooks));
 
 	if (avc_add_callback(selinux_netcache_avc_callback, AVC_CALLBACK_RESET))
 		panic("SELinux: Unable to register AVC netcache callback\n");
@@ -6434,7 +6374,7 @@ int selinux_disable(void)
 	selinux_disabled = 1;
 	selinux_enabled = 0;
 
-	reset_security_ops();
+	security_delete_hooks(selinux_hooks, ARRAY_SIZE(selinux_hooks));
 
 	/* Try to destroy the avc node cache */
 	avc_disable();
