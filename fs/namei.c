@@ -23,7 +23,7 @@
 #include <linux/pagemap.h>
 #include <linux/fsnotify.h>
 #include <linux/personality.h>
-#include <linux/security.h>
+#include <linux/lsm_hooks.h>
 #include <linux/ima.h>
 #include <linux/syscalls.h>
 #include <linux/mount.h>

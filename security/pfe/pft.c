@@ -62,7 +62,7 @@
 #include <linux/bitops.h>
 #include <linux/fdtable.h>
 #include <linux/selinux.h>
-#include <linux/security.h>
+#include <linux/lsm_hooks.h>
 
 #include <linux/pft.h>
 #include <uapi/linux/msm_pft.h>
