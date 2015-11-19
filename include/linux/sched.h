@@ -1583,7 +1583,7 @@ struct task_struct {
 	unsigned long long cpu_power;
 	struct prev_cputime prev_cputime;
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
-	seqlock_t vtime_seqlock;
+	seqcount_t vtime_seqcount;
 	unsigned long long vtime_snap;
 	enum {
 		/* Task is sleeping or running in a CPU with VTIME inactive */
