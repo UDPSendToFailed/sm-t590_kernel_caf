@@ -44,7 +44,10 @@ do
 		then
 			configcheck.sh $i/.config $i/ConfigFragment
 			parse-build.sh $i/Make.out $configfile
-			parse-torture.sh $i/console.log $configfile
+			if test "$TORTURE_SUITE" != rcuperf
+			then
+				parse-torture.sh $i/console.log $configfile
+			fi
 			parse-console.sh $i/console.log $configfile
 			if test -r $i/Warnings
 			then
