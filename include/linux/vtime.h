@@ -14,6 +14,18 @@ struct task_struct;
  */
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
 static inline bool vtime_accounting_enabled(void) { return true; }
+
+#ifdef __ARCH_HAS_VTIME_ACCOUNT
+extern void vtime_account_irq_enter(struct task_struct *tsk);
+#else
+extern void vtime_common_account_irq_enter(struct task_struct *tsk);
+static inline void vtime_account_irq_enter(struct task_struct *tsk)
+{
+	if (vtime_accounting_enabled())
+		vtime_common_account_irq_enter(tsk);
+}
+#endif /* __ARCH_HAS_VTIME_ACCOUNT */
+
 #endif /* CONFIG_VIRT_CPU_ACCOUNTING_NATIVE */
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
@@ -53,6 +65,7 @@ extern void vtime_account_system(struct task_struct *tsk);
 extern void vtime_account_idle(struct task_struct *tsk);
 extern void vtime_account_user(struct task_struct *tsk);
 
+<<<<<<< HEAD
 #ifdef __ARCH_HAS_VTIME_ACCOUNT
 extern void vtime_account_irq_enter(struct task_struct *tsk);
 #else
@@ -64,6 +77,8 @@ static inline void vtime_account_irq_enter(struct task_struct *tsk)
 }
 #endif /* __ARCH_HAS_VTIME_ACCOUNT */
 
+=======
+>>>>>>> b58c35840521... sched/cputime: Replace VTIME_GEN irq time code with IRQ_TIME_ACCOUNTING code
 #else /* !CONFIG_VIRT_CPU_ACCOUNTING */
 
 static inline void vtime_task_switch(struct task_struct *prev) { }
@@ -74,6 +89,7 @@ static inline void vtime_account_irq_enter(struct task_struct *tsk) { }
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
 extern void arch_vtime_task_switch(struct task_struct *tsk);
+<<<<<<< HEAD
 extern void vtime_gen_account_irq_exit(struct task_struct *tsk);
 
 static inline void vtime_account_irq_exit(struct task_struct *tsk)
@@ -81,6 +97,10 @@ static inline void vtime_account_irq_exit(struct task_struct *tsk)
 	if (vtime_accounting_enabled())
 		vtime_gen_account_irq_exit(tsk);
 }
+=======
+static inline void vtime_account_irq_enter(struct task_struct *tsk) { }
+static inline void vtime_account_irq_exit(struct task_struct *tsk) { }
+>>>>>>> b58c35840521... sched/cputime: Replace VTIME_GEN irq time code with IRQ_TIME_ACCOUNTING code
 
 extern void vtime_user_enter(struct task_struct *tsk);
 
