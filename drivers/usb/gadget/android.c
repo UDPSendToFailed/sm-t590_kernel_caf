@@ -3044,7 +3044,7 @@ static int mass_storage_function_bind_config(struct android_usb_function *f,
 
 	ret = usb_add_function(c, config->f_ms);
 	if (ret) {
-		pr_err("Could not bind mass_storage config\n");
+		pr_err("Could not bind ms:%s config\n", config->f_ms->name);
 		goto err_usb_add_function;
 	}
 
