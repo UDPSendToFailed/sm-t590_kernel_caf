@@ -216,6 +216,7 @@ struct edge_info {
 	spinlock_t rx_lock;
 	struct list_head deferred_cmds;
 	uint32_t num_pw_states;
+	uint32_t readback;
 	unsigned long *ramp_time_us;
 	struct mailbox_config_info *mailbox;
 };
@@ -262,6 +263,7 @@ static void send_irq(struct edge_info *einfo)
 	 * Any data associated with this event must be visable to the remote
 	 * before the interrupt is triggered
 	 */
+	einfo->readback = einfo->tx_ch_desc->write_index;
 	wmb();
 	writel_relaxed(einfo->out_irq_mask, einfo->out_irq_reg);
 	einfo->tx_irq_count++;
