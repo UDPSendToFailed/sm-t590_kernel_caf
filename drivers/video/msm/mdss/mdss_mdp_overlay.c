@@ -2928,12 +2928,15 @@ int mdss_mdp_overlay_kickoff(struct msm_fb_data_type *mfd,
 		return ret;
 	}
 
+	mdss_mdp_pp_commit_notify(ctl, true);
+
 	ret = mdss_iommu_ctrl(1);
 	if (IS_ERR_VALUE(ret)) {
 		pr_err("iommu attach failed rc=%d\n", ret);
 		mutex_unlock(&mdp5_data->ov_lock);
 		if (ctl->shared_lock)
 			mutex_unlock(ctl->shared_lock);
+		mdss_mdp_pp_commit_notify(ctl, false);
 		return ret;
 	}
 	mutex_lock(&mdp5_data->list_lock);
@@ -2952,6 +2955,8 @@ int mdss_mdp_overlay_kickoff(struct msm_fb_data_type *mfd,
 	sd_transition_state = mdp5_data->sd_transition_state;
 	if (sd_transition_state != SD_TRANSITION_NONE) {
 		ret = __config_secure_display(mdp5_data);
+	        mdss_mdp_pp_commit_notify(ctl, false);
+
 		if (IS_ERR_VALUE(ret)) {
 			pr_err("Secure session config failed\n");
 			goto commit_fail;
