@@ -4330,6 +4330,8 @@ void msm_ipc_router_xprt_notify(struct msm_ipc_router_xprt *xprt,
 		__pm_stay_awake(&xprt_info->ws);
 
 	mutex_unlock(&xprt_info->rx_lock_lhb2);
+	if (rport_ptr)
+		kref_put(&rport_ptr->ref, ipc_router_release_rport);
 	queue_work(xprt_info->workqueue, &xprt_info->read_data);
 }
 
