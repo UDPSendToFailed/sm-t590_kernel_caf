@@ -45,6 +45,7 @@ typedef unsigned long mm_segment_t;
  */
 struct thread_info {
 	unsigned long		flags;		/* low level flags */
+	unsigned long		padding[7];
 	mm_segment_t		addr_limit;	/* address limit */
 #ifndef CONFIG_THREAD_INFO_IN_TASK
 	struct task_struct	*task;		/* main task structure */
