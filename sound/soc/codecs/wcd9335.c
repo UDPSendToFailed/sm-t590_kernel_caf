@@ -4933,6 +4933,10 @@ static int tasha_codec_spk_boost_event(struct snd_soc_dapm_widget *w,
 		boost_path_cfg1 = WCD9335_CDC_RX8_RX_PATH_CFG1;
 		reg = WCD9335_CDC_RX8_RX_PATH_CTL;
 		reg_mix = WCD9335_CDC_RX8_RX_PATH_MIX_CTL;
+	} else {
+		dev_err(codec->dev, "%s: unknown widget: %s\n",
+			__func__, w->name);
+		return -EINVAL;
 	}
 
 	switch (event) {
@@ -4954,7 +4958,7 @@ static int tasha_codec_spk_boost_event(struct snd_soc_dapm_widget *w,
 
 static u16 tasha_interp_get_primary_reg(u16 reg, u16 *ind)
 {
-	u16 prim_int_reg;
+	u16 prim_int_reg = 0;
 
 	switch (reg) {
 	case WCD9335_CDC_RX0_RX_PATH_CTL:
@@ -5089,11 +5093,11 @@ static int tasha_codec_enable_spline_src(struct snd_soc_codec *codec,
 					 int src_num,
 					 int event)
 {
-	u16 rx_path_cfg_reg;
-	u16 rx_path_ctl_reg;
-	u16 src_clk_reg;
+	u16 rx_path_cfg_reg = WCD9335_CDC_RX1_RX_PATH_CFG0;
+	u16 rx_path_ctl_reg = WCD9335_CDC_RX1_RX_PATH_CTL;
+	u16 src_clk_reg = WCD9335_SPLINE_SRC0_CLK_RST_CTL_0;
 	u16 src_paired_reg = 0;
-	int *src_users, count, spl_src;
+	int *src_users, count, spl_src = SPLINE_SRC0;
 	struct tasha_priv *tasha;
 
 	tasha = snd_soc_codec_get_drvdata(codec);
@@ -6414,7 +6418,7 @@ static int tasha_codec_force_enable_micbias(struct snd_soc_dapm_widget *w,
 					    struct snd_kcontrol *kcontrol,
 					    int event)
 {
-	int ret;
+	int ret = 0;
 	struct snd_soc_codec *codec = w->codec;
 	struct tasha_priv *tasha = snd_soc_codec_get_drvdata(codec);
 
@@ -8682,6 +8686,7 @@ static int tasha_codec_vbat_enable_event(struct snd_soc_dapm_widget *w,
 
 	vbat_path_ctl = WCD9335_CDC_VBAT_VBAT_PATH_CTL;
 	vbat_cfg = WCD9335_CDC_VBAT_VBAT_CFG;
+	vbat_path_cfg = WCD9335_CDC_RX8_RX_PATH_CFG1;
 
 	if (!strcmp(w->name, "RX INT8 VBAT"))
 		vbat_path_cfg = WCD9335_CDC_RX8_RX_PATH_CFG1;
@@ -9040,7 +9045,7 @@ static int tasha_int_dem_inp_mux_put(struct snd_kcontrol *kcontrol,
 	struct snd_soc_codec *codec = widget->codec;
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 	unsigned int val;
-	unsigned short look_ahead_dly_reg;
+	unsigned short look_ahead_dly_reg = WCD9335_CDC_RX0_RX_PATH_CFG0;
 
 	val = ucontrol->value.enumerated.item[0];
 	if (val >= e->items)
@@ -12626,7 +12631,7 @@ static ssize_t tasha_codec_version_read(struct snd_info_entry *entry,
 	struct tasha_priv *tasha;
 	struct wcd9xxx *wcd9xxx;
 	char buffer[TASHA_VERSION_ENTRY_SIZE];
-	int len;
+	int len = 0;
 
 	tasha = (struct tasha_priv *) entry->private_data;
 	if (!tasha) {
