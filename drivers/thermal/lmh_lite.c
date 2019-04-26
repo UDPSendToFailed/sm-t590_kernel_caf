@@ -366,6 +366,7 @@ read_exit:
 	return;
 }
 
+#ifdef CONFIG_LIMITS_LITE_HW_POLLING
 static void lmh_poll(struct work_struct *work)
 {
 	struct lmh_driver_data *lmh_dat = container_of(work,
@@ -390,6 +391,7 @@ poll_exit:
 	up_write(&lmh_sensor_access);
 	return;
 }
+#endif
 
 static void lmh_trim_error(void)
 {
@@ -1290,6 +1292,7 @@ static int lmh_probe(struct platform_device *pdev)
 	}
 	lmh_data->dev = &pdev->dev;
 
+#ifdef CONFIG_LIMITS_LITE_HW_POLLING
 	lmh_data->poll_wq = alloc_workqueue("lmh_poll_wq", WQ_UNBOUND, 1);
 	if (!lmh_data->poll_wq) {
 		pr_err("Error allocating workqueue\n");
@@ -1297,6 +1300,7 @@ static int lmh_probe(struct platform_device *pdev)
 		goto probe_exit;
 	}
 	INIT_DEFERRABLE_WORK(&lmh_data->poll_work, lmh_poll);
+#endif
 
 	ret = lmh_sensor_init(pdev);
 	if (ret) {
@@ -1320,7 +1324,9 @@ static int lmh_probe(struct platform_device *pdev)
 	}
 	platform_set_drvdata(pdev, lmh_data);
 
+#ifndef CONFIG_LIMITS_LITE_HW_POLLING
 	return ret;
+#endif
 
 probe_exit:
 	if (lmh_data->poll_wq)
