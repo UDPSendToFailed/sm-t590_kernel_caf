@@ -213,6 +213,11 @@ struct callback_head {
 };
 #define rcu_head callback_head
 
+typedef void (*swap_func_t)(void *a, void *b, int size);
+
+typedef int (*cmp_r_func_t)(const void *a, const void *b, const void *priv);
+typedef int (*cmp_func_t)(const void *a, const void *b);
+
 /* clocksource cycle base type */
 typedef u64 cycle_t;
 
