@@ -365,7 +365,7 @@ void removed_sync_sg_for_device(struct device *dev,
 }
 
 static void __iomem *removed_remap(struct device *dev, void *cpu_addr,
-			dma_addr_t handle, size_t size, unsigned long attrs)
+			dma_addr_t handle, size_t size, struct dma_attrs *attrs)
 {
 	return ioremap_wc(handle, size);
 }
