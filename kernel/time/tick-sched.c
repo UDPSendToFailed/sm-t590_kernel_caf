@@ -621,7 +621,7 @@ static ktime_t tick_nohz_stop_sched_tick(struct tick_sched *ts,
 	 * minimal delta which brings us back to this place
 	 * immediately. Lather, rinse and repeat...
 	 */
-	if (rcu_needs_cpu(cpu, &rcu_delta_jiffies) || arch_needs_cpu() ||
+	if (rcu_needs_cpu(&rcu_delta_jiffies) || arch_needs_cpu() ||
 	    irq_work_needs_cpu() || local_timer_softirq_pending()) {
 		next_jiffies = last_jiffies + 1;
 		delta_jiffies = 1;
