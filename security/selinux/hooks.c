@@ -2074,7 +2074,7 @@ static int selinux_capable(const struct cred *cred, struct user_namespace *ns,
 {
 	int rc;
 
-	return cred_has_capability(cred, cap, audit, ns == &init_user_ns);
+	return cred_has_capability(cred, cap, audit);
 }
 
 static int selinux_quotactl(int cmds, int type, int id, struct super_block *sb)
