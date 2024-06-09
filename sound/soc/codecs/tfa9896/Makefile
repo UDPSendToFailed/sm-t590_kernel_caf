@@ -1,60 +1,51 @@
-# NXP audio amplifier - TFA9896
 
-TFA_VERSION              =tfa9896
-#TFADSP_32BITS           =0
-#TFADSP_DSP_MSG_APR_PACKET_STRATEGY=0
-TFADSP_DSP_BUFFER_POOL   =1
-#TFA_ACTIVATED_ASYNCHRONOUSLY=0
-TFA_USE_PSTREAM_ONLY     =1
-#TFA_USE_DEVICE_SPECIFIC_CONTROL=0
-#TFA_PROFILE_ON_DEVICE   =0
-TFA_NO_SND_FORMAT_CHECK  =0
-TFA_SRC_DIR              =sound/soc/codecs/$(TFA_VERSION)
-TFA98XX_FLAGS           := -DUSE_TFA9896
+# Copyright (C) 2014-2020 NXP Semiconductors, All Rights Reserved.
+# Copyright 2020 GOODIX 
+#
+#This program is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License version 2 as
+#published by the Free Software Foundation.
 
-# cc flags
-#ccflags-y               := -DDEBUG
-#ccflags-y               += -I$(TFA_SRC_DIR)/inc
-ccflags-y               := -I$(TFA_SRC_DIR)/inc
-ccflags-y               += -Werror
-#ifdef TFADSP_32BITS
-#ccflags-y               += -DTFADSP_32BITS
-#endif
-#ifdef TFADSP_DSP_MSG_APR_PACKET_STRATEGY
-#ccflags-y               += -DTFADSP_DSP_MSG_APR_PACKET_STRATEGY
-#endif
-ifdef TFADSP_DSP_BUFFER_POOL
-ccflags-y               += -DTFADSP_DSP_BUFFER_POOL
-endif
-ifdef TFA_ACTIVATED_ASYNCHRONOUSLY
-ccflags-y               += -DTFA_ACTIVATED_ASYNCHRONOUSLY
-endif
-ifdef TFA_USE_PSTREAM_ONLY
-ccflags-y               += -DTFA_USE_PSTREAM_ONLY
-endif
-ifdef TFA_USE_DEVICE_SPECIFIC_CONTROL
-ccflags-y               += -DTFA_USE_DEVICE_SPECIFIC_CONTROL
-endif
-ifdef TFA_PROFILE_ON_DEVICE
-ccflags-y               += -DTFA_PROFILE_ON_DEVICE
-endif
-ifdef TFA_NO_SND_FORMAT_CHECK
-ccflags-y               += -DTFA_NO_SND_FORMAT_CHECK
-endif
+# make sure that the environment variables ARCH and CROSS_COMPILE
+# are set for your architecture and cross compiler.
+# And that KDIR points to the kernel to build against.
+#
+# e.g.:
+# export ARCH=arm
+# export CROSS_COMPILE=arm-linux-gnueabihf-
+# export KDIR=../linux
 
-# objs
-snd-soc-tfa98xx-objs    := tfa98xx.o
-snd-soc-tfa98xx-objs    += tfa_container.o
-snd-soc-tfa98xx-objs    += tfa_dsp.o
-snd-soc-tfa98xx-objs    += tfa_init.o
-snd-soc-tfa98xx-objs    += tfa_debug.o
+ifneq ($(KERNELRELEASE),)
 
-# CFLAGS
-CFLAGS_tfa98xx.o       += $(TFA98XX_FLAGS)
-CFLAGS_tfa_container.o += $(TFA98XX_FLAGS)
-CFLAGS_tfa_dsp.o       += $(TFA98XX_FLAGS)
-CFLAGS_tfa_init.o      += $(TFA98XX_FLAGS)
-CFLAGS_tfa_debug.o     += $(TFA98XX_FLAGS)
+# add version number derived from Git
+ifeq ($(KDIR),)
+PLMA_TFA_AUDIO_DRV_DIR=$(realpath -f $(srctree)/$(src))
+else
+PLMA_TFA_AUDIO_DRV_DIR=$(realpath -f $(src))
+endif
+GIT_VERSION=$(shell cd $(PLMA_TFA_AUDIO_DRV_DIR); git describe --tags --dirty --match "v[0-9]*.[0-9]*.[0-9]*")
+EXTRA_CFLAGS += -DTFA98XX_GIT_VERSIONS=\"$(GIT_VERSION)\"
 
-# built-in driver
-obj-y	+= snd-soc-tfa98xx.o
+EXTRA_CFLAGS += -I$(src)/inc
+EXTRA_CFLAGS += -Werror
+
+obj-$(CONFIG_SND_SOC_TFA9896) := snd-soc-tfa98xx.o
+
+snd-soc-tfa98xx-objs += tfa98xx.o
+snd-soc-tfa98xx-objs += tfa_container.o
+snd-soc-tfa98xx-objs += tfa_dsp.o
+snd-soc-tfa98xx-objs += tfa_init.o
+
+
+else
+
+MAKEARCH := $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
+
+all:
+	$(MAKEARCH) -C $(KDIR) M=$(PWD) modules
+
+clean:
+	$(MAKEARCH) -C $(KDIR) M=$(PWD) clean
+	rm -f $(snd-soc-tfa98xx-objs)
+
+endif
