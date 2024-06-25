@@ -788,7 +788,7 @@ config SW_SELF_DISCHARGING
 	  Say Y to enable CONFIG_SW_SELF_DISCHARGING
 
 config BATTERY_AGE_FORECAST
-	tristate "battery age forecast"
+	bool "battery age forecast"
 	default n
 	depends on BATTERY_SWELLING
 	help
