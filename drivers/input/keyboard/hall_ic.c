@@ -90,7 +90,7 @@ static void flip_cover_work(struct work_struct *work)
 
 	flip_cover = first;
 #if defined(CONFIG_SENSORS_HALL_FOLDER)
-	input_report_switch(ddata->input, SW_LID, !flip_cover);	/* foder open : 0, close : 1 */
+	input_report_switch(ddata->input, SW_LID, flip_cover);	/* foder open : 0, close : 1 */
 #else
 	input_report_switch(ddata->input, SW_FLIP, flip_cover);
 #endif
