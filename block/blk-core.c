@@ -1687,15 +1687,18 @@ static inline void blk_partition_remap(struct bio *bio)
 
 static void handle_bad_sector(struct bio *bio)
 {
+	static int log_count = 0;
 	char b[BDEVNAME_SIZE];
 
-	printk(KERN_INFO "attempt to access beyond end of device\n");
-	printk(KERN_INFO "%s: rw=%ld, want=%Lu, limit=%Lu\n",
-			bdevname(bio->bi_bdev, b),
-			bio->bi_rw,
-			(unsigned long long)bio_end_sector(bio),
-			(long long)(i_size_read(bio->bi_bdev->bd_inode) >> 9));
-
+	if (log_count < 10) {
+		printk(KERN_INFO "attempt to access beyond end of device\n");
+		printk(KERN_INFO "%s: rw=%ld, want=%Lu, limit=%Lu\n",
+				bdevname(bio->bi_bdev, b),
+				bio->bi_rw,
+				(unsigned long long)bio_end_sector(bio),
+				(long long)(i_size_read(bio->bi_bdev->bd_inode) >> 9));
+				log_count++;
+	}
 	set_bit(BIO_EOF, &bio->bi_flags);
 }
 
