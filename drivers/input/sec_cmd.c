@@ -321,6 +321,7 @@ static ssize_t sec_cmd_store(struct device *dev, struct device_attribute *devatt
 	struct sec_cmd_data *data = dev_get_drvdata(dev);
 	struct command cmd = {{0}};
 	int queue_size;
+    char *cur;
 
 	if (!data) {
 		pr_err("%s %s: No platform data found\n", SECLOG, __func__);
@@ -337,6 +338,13 @@ static ssize_t sec_cmd_store(struct device *dev, struct device_attribute *devatt
 		pr_err("%s %s: cmd length(count) is over (%d,%s)!!\n",
 				SECLOG, __func__, (unsigned int)count, buf);
 		return -EINVAL;
+	}
+
+    if (strncmp(buf, "aot_enable", strlen("aot_enable")) == 0) {
+        cur = strrchr(buf, '_');
+        if (cur) {
+            *cur = ',';
+        }
 	}
 
 	strncpy(cmd.cmd, buf, count);
