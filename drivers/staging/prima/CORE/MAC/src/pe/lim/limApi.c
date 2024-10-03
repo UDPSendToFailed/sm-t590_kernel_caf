@@ -2511,15 +2511,15 @@ bool lim_is_assoc_req_for_drop(tpAniSirGlobal pMac, uint8_t *rx_pkt_info)
     if (sta_ds->last_assoc_received_time &&
        ((vos_timer_get_system_time() -
          sta_ds->last_assoc_received_time) < 1000)) {
-	 status = true;
-	 goto end;
+        status = true;
+        goto end;
     }
 
     sta_ds->last_assoc_received_time = vos_timer_get_system_time();
     status = false;
 end:
-	pe_ReleaseGlobalLock(&pMac->lim);
-	return status;
+    pe_ReleaseGlobalLock(&pMac->lim);
+    return status;
 }
 #endif
 
