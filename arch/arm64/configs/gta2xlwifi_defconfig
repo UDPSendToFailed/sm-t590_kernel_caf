@@ -3996,17 +3996,15 @@ CONFIG_ION_MSM=y
 # CONFIG_DGNC is not set
 # CONFIG_DGAP is not set
 # CONFIG_GS_FPGABOOT is not set
-CONFIG_SEC_STI=y
+# CONFIG_SEC_STI is not set
 
 #
 # Samsung ABC Options
 #
-CONFIG_SEC_ABC=y
 
 #
 # Samsung ABC Hub Options
 #
-# CONFIG_SEC_ABC_HUB is not set
 
 #
 # Samsung ABC Hub Connect Detect Options
