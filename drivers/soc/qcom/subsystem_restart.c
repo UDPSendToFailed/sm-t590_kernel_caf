@@ -1134,6 +1134,7 @@ int subsystem_restart_dev(struct subsys_device *dev)
 
 	name = dev->desc->name;
 
+#ifdef CONFIG_SEC_DEBUG_SUMMARY
 	if ((sec_debug_is_modem_seperate_debug_ssr() == SEC_DEBUG_MODEM_SEPERATE_EN)
 	    && strcmp(name, "adsp")) {
 		pr_info("SSR seperated by cp magic!!\n");
@@ -1143,6 +1144,7 @@ int subsystem_restart_dev(struct subsys_device *dev)
 		enabled_for_ssr = 1;
 		/* if (!enabled_for_ssr) || ...) => if ((!1) || ...) => if (...) */
 	}
+#endif
 
 	if ((!enabled_for_ssr) || (!sec_debug_is_enabled()) || silent_ssr)
 		/* Why is it delete the RESET_SUBSYS_INDEPENDENT on MSM8974 ? */
