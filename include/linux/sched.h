@@ -1324,10 +1324,6 @@ union rcu_special {
 };
 struct rcu_node;
 
-#ifdef CONFIG_FIVE
-struct task_integrity;
-#endif
-
 enum perf_event_task_context {
 	perf_invalid_context = -1,
 	perf_hw_context = 0,
@@ -1809,9 +1805,6 @@ struct task_struct {
 	unsigned int sensitive;
 #endif
 
-#ifdef CONFIG_FIVE
-	struct task_integrity *integrity;
-#endif
 };
 
 /* Future-safe accessor for struct task_struct's cpus_allowed. */

@@ -16,7 +16,6 @@
  */
 
 #include <linux/types.h>
-#include <linux/task_integrity.h>
 #include <soc/qcom/scm.h>
 #include "oemflag.h"
 
