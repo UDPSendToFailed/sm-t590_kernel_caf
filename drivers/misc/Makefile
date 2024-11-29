@@ -81,8 +81,5 @@ obj-$(CONFIG_TIMA)		+= tima_debug_test.o
 obj-$(CONFIG_TIMA_LOG)		+= tima_debug_log.o
 endif
 
-# for DMVerity
-obj-$(CONFIG_DM_VERITY)		+= dmverity_query.o
-
 # for dev-ril-bridge
 obj-$(CONFIG_DEV_RIL_BRIDGE)	+= dev_ril_bridge/

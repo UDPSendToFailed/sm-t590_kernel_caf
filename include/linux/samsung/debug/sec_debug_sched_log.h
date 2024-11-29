@@ -64,17 +64,6 @@ extern int ___sec_debug_msg_log(void *caller, const char *fmt, ...);
 #endif /* CONFIG_SEC_DEBUG_MSG_LOG */
 
 
-/* KNOX_SEANDROID_START */
-#ifdef CONFIG_SEC_DEBUG_AVC_LOG
-/* FIXME: this function is not referenced anywhere */
-extern int __deprecated sec_debug_avc_log(const char *fmt, ...);
-
-#else /* CONFIG_SEC_DEBUG_AVC_LOG */
-static inline int sec_debug_avc_log(const char *fmt, ...) { return 0; }
-#endif /* CONFIG_SEC_DEBUG_AVC_LOG */
-/* KNOX_SEANDROID_END */
-
-
 #ifdef CONFIG_SEC_DEBUG_DCVS_LOG
 /* FIXME: this function is not referenced anywhere */
 extern void __deprecated sec_debug_dcvs_log(int cpu_no, unsigned int prev_freq, unsigned int new_freq);

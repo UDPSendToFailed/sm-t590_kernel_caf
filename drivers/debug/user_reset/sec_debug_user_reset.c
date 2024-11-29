@@ -36,10 +36,6 @@
 #include <linux/sec_param.h>
 #include <linux/sec_class.h>
 
-#ifdef CONFIG_RKP_CFP_ROPP
-#include <linux/rkp_cfp.h>
-#endif
-
 static char rr_str[][3] = {
 	[USER_UPLOAD_CAUSE_SMPL] = "SP",
 	[USER_UPLOAD_CAUSE_WTSR] = "WP",
@@ -899,9 +895,6 @@ void sec_debug_backtrace(void)
 	static int once = 0;
 	struct stackframe frame;
 	int skip_callstack = 0;
-#ifdef CONFIG_RKP_CFP_ROPP
-	unsigned long where = 0x0;
-#endif
 
 	if (!once++) {
 		frame.fp = (unsigned long)__builtin_frame_address(0);
@@ -910,25 +903,12 @@ void sec_debug_backtrace(void)
 
 		while (1) {
 			int ret;
-
-#ifdef CONFIG_RKP_CFP_ROPP
-			ret = unwind_frame(current, &frame);
-#else
 			ret = unwind_frame(&frame);
-#endif
 			if (ret < 0)
 				break;
 
 			if (skip_callstack++ > 3) {
-#ifdef CONFIG_RKP_CFP_ROPP
-				where = frame.pc;
-				if (where>>40 != 0xffffff){
-					where = ropp_enable_backtrace(where, current);
-				}
-				_sec_debug_store_backtrace(where);
-#else
 				_sec_debug_store_backtrace(frame.pc);
-#endif
 			}
 		}
 	}

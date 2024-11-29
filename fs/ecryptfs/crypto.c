@@ -43,10 +43,6 @@
 
 #include "ecryptfs_kernel.h"
 
-#ifdef CONFIG_SDP
-#include "ecryptfs_dek.h"
-#endif
-
 #define DECRYPT		0
 #define ENCRYPT		1
 
@@ -676,31 +672,6 @@ int ecryptfs_encrypt_page(struct page *page)
 	crypt_stat =
 		&(ecryptfs_inode_to_private(ecryptfs_inode)->crypt_stat);
 	BUG_ON(!(crypt_stat->flags & ECRYPTFS_ENCRYPTED));
-#ifdef CONFIG_SDP
-	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET) ||
-			!(crypt_stat->flags & ECRYPTFS_KEY_VALID)) {
-		if((crypt_stat->flags & ECRYPTFS_DEK_SDP_ENABLED) &&
-			(crypt_stat->flags & ECRYPTFS_DEK_IS_SENSITIVE)) {
-			rc = ecryptfs_get_sdp_dek(crypt_stat);
-			if (rc) {
-				ecryptfs_printk(KERN_ERR, "%s Get SDP key failed\n", __func__);
-				goto out;
-			}
-			rc = ecryptfs_compute_root_iv(crypt_stat);
-			if (rc) {
-				ecryptfs_printk(KERN_ERR, "Error computing "
-						"the root IV\n");
-				goto out;
-			}
-		}
-	}
-#if ECRYPTFS_DEK_DEBUG
-	ecryptfs_printk(KERN_ERR, "\tKEY [%zd]:\n", crypt_stat->key_size);
-	ecryptfs_dump_hex(crypt_stat->key, crypt_stat->key_size);
-	ecryptfs_printk(KERN_ERR, "\tIV [%d]:\n", ECRYPTFS_MAX_IV_BYTES);
-	ecryptfs_dump_hex(crypt_stat->root_iv, ECRYPTFS_MAX_IV_BYTES);
-#endif
-#endif
 
 	init_ecryption_parameters(&is_hw_crypt,
 		&is_cipher_supported, crypt_stat);
@@ -802,32 +773,6 @@ int ecryptfs_decrypt_page(struct page *page)
 	crypt_stat =
 		&(ecryptfs_inode_to_private(ecryptfs_inode)->crypt_stat);
 	BUG_ON(!(crypt_stat->flags & ECRYPTFS_ENCRYPTED));
-
-#ifdef CONFIG_SDP
-	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET) ||
-			!(crypt_stat->flags & ECRYPTFS_KEY_VALID)) {
-		if((crypt_stat->flags & ECRYPTFS_DEK_SDP_ENABLED) &&
-			(crypt_stat->flags & ECRYPTFS_DEK_IS_SENSITIVE)) {
-			rc = ecryptfs_get_sdp_dek(crypt_stat);
-			if (rc) {
-				ecryptfs_printk(KERN_ERR, "%s Get SDP key failed\n", __func__);
-				goto out;
-			}
-			rc = ecryptfs_compute_root_iv(crypt_stat);
-			if (rc) {
-				ecryptfs_printk(KERN_ERR, "Error computing "
-						"the root IV\n");
-				goto out;
-			}
-		}
-	}
-#if ECRYPTFS_DEK_DEBUG
-	ecryptfs_printk(KERN_ERR, "\tKEY [%zd]:\n", crypt_stat->key_size);
-	ecryptfs_dump_hex(crypt_stat->key, crypt_stat->key_size);
-	ecryptfs_printk(KERN_ERR, "\tIV [%d]:\n", ECRYPTFS_MAX_IV_BYTES);
-	ecryptfs_dump_hex(crypt_stat->root_iv, ECRYPTFS_MAX_IV_BYTES);
-#endif
-#endif
 
 	lower_offset = lower_offset_for_page(crypt_stat, page);
 	page_virt = kmap(page);
@@ -1074,10 +1019,6 @@ static void ecryptfs_copy_mount_wide_flags_to_inode_flags(
 			 & ECRYPTFS_GLOBAL_ENCFN_USE_FEK)
 			crypt_stat->flags |= ECRYPTFS_ENCFN_USE_FEK;
 	}
-#ifdef CONFIG_SDP
-    if (mount_crypt_stat->flags & ECRYPTFS_MOUNT_SDP_ENABLED)
-        crypt_stat->flags |= ECRYPTFS_DEK_SDP_ENABLED;
-#endif
 }
 
 static int ecryptfs_copy_mount_wide_sigs_to_inode_sigs(
@@ -1127,12 +1068,6 @@ static void ecryptfs_set_default_crypt_stat_vals(
 	crypt_stat->flags &= ~(ECRYPTFS_KEY_VALID);
 	crypt_stat->file_version = ECRYPTFS_FILE_VERSION;
 	crypt_stat->mount_crypt_stat = mount_crypt_stat;
-#ifdef CONFIG_SDP
-	crypt_stat->engine_id = -1;
-#endif
-#ifdef CONFIG_DLP
-	memset(&crypt_stat->expiry, 0, sizeof(struct knox_dlp_data));
-#endif
 }
 
 /**
@@ -1229,17 +1164,7 @@ static struct ecryptfs_flag_map_elem ecryptfs_flag_map[] = {
 	{0x00000002, ECRYPTFS_ENCRYPTED},
 	{0x00000004, ECRYPTFS_METADATA_IN_XATTR},
     {0x00000010, ECRYPTFS_SUPPORT_HMAC_KEY},
-#ifdef CONFIG_SDP
 	{0x00000008, ECRYPTFS_ENCRYPT_FILENAMES},
-	{0x00100000, ECRYPTFS_DEK_SDP_ENABLED},
- 	{0x00200000, ECRYPTFS_DEK_IS_SENSITIVE},
-	{0x00400000, ECRYPTFS_DEK_MULTI_ENGINE},
-#else
-	{0x00000008, ECRYPTFS_ENCRYPT_FILENAMES},
-#endif
-#ifdef CONFIG_DLP
-	{0x00080000, ECRYPTFS_DLP_ENABLED},
-#endif
 };
 
 /**
@@ -1483,11 +1408,6 @@ static int ecryptfs_write_headers_virt(char *page_virt, size_t max,
 	int rc;
 	size_t written;
 	size_t offset;
-
-#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
-	crypt_stat->flags |= ECRYPTFS_ENABLE_HMAC;
-	crypt_stat->flags |= ECRYPTFS_SUPPORT_HMAC_KEY;
-#endif
 	offset = ECRYPTFS_FILE_SIZE_BYTES;
 	write_ecryptfs_marker((page_virt + offset), &written);
 	offset += written;
@@ -1503,9 +1423,6 @@ static int ecryptfs_write_headers_virt(char *page_virt, size_t max,
 	if (rc)
 		ecryptfs_printk(KERN_WARNING, "Error generating key packet "
 				"set; rc = [%d]\n", rc);
-#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
-	memcpy((page_virt + HASH_OFFSET), crypt_stat->hash, FEK_HASH_SIZE);
-#endif
 	if (size) {
 		offset += written;
 		*size = offset;
@@ -1587,18 +1504,6 @@ int ecryptfs_write_metadata(struct dentry *ecryptfs_dentry,
 		rc = -EINVAL;
 		goto out;
 	}
-#ifdef CONFIG_SDP
-#if ECRYPTFS_DEK_DEBUG
-	ecryptfs_printk(KERN_INFO, "name is [%s], flag is %d\n",
-			ecryptfs_dentry->d_name.name, crypt_stat->flags);
-	if (crypt_stat->flags & ECRYPTFS_DEK_IS_SENSITIVE) {
-		ecryptfs_printk(KERN_INFO, "is sensitive\n");
-	}
-	else{
-		ecryptfs_printk(KERN_INFO, "is protected\n");
-	}
-#endif
-#endif
 	virt_len = crypt_stat->metadata_size;
 	order = get_order(virt_len);
 	/* Released in this function */
@@ -1748,11 +1653,6 @@ static int ecryptfs_read_headers_virt(char *page_virt,
 		offset += bytes_read;
 	} else
 		set_default_header_data(crypt_stat);
-#ifdef CONFIG_ECRYPTFS_FEK_INTEGRITY
-	if(crypt_stat->flags & ECRYPTFS_ENABLE_HMAC) {
-		memcpy(crypt_stat->hash, (page_virt + HASH_OFFSET), FEK_HASH_SIZE);
-	}
-#endif
 	rc = ecryptfs_parse_packet_set(crypt_stat, (page_virt + offset),
 				       ecryptfs_dentry);
 out:
@@ -1858,14 +1758,6 @@ int ecryptfs_read_metadata(struct dentry *ecryptfs_dentry)
 		rc = ecryptfs_read_headers_virt(page_virt, crypt_stat,
 						ecryptfs_dentry,
 						ECRYPTFS_VALIDATE_HEADER_SIZE);
-#ifdef CONFIG_SDP
-	if ((rc) && crypt_stat->flags & ECRYPTFS_DEK_IS_SENSITIVE)
-		/*
-		 * metadata is not in the file header, SDP sensitive file.
-		 * Don't check xattr region. we don't put info there.
-		 */
-		goto out;
-#endif
 	if (rc) {
 		/* metadata is not in the file header, so try xattrs */
 		memset(page_virt, 0, PAGE_CACHE_SIZE);
@@ -1899,23 +1791,6 @@ int ecryptfs_read_metadata(struct dentry *ecryptfs_dentry)
 			rc = -EINVAL;
 		}
 	}
-#ifdef CONFIG_SDP
-#if ECRYPTFS_DEK_DEBUG
-	ecryptfs_printk(KERN_INFO, "name is [%s], flag is %d\n",
-			ecryptfs_dentry->d_name.name, crypt_stat->flags);
-	if (crypt_stat->flags & ECRYPTFS_DEK_IS_SENSITIVE) {
-		ecryptfs_printk(KERN_INFO, "dek_file_type is sensitive, enc type=%d\n",
-				crypt_stat->sdp_dek.type);
-		if (ecryptfs_is_persona_locked(crypt_stat->engine_id)) {
-			ecryptfs_printk(KERN_INFO, "persona is locked, rc=%d\n", rc);
-		} else {
-			ecryptfs_printk(KERN_INFO, "persona is unlocked, rc=%d\n", rc);
-		}
-	} else {
-		ecryptfs_printk(KERN_INFO, "dek_file_type is protected\n");
-	}
-#endif
-#endif
 out:
 	if (page_virt) {
 		memset(page_virt, 0, PAGE_CACHE_SIZE);
