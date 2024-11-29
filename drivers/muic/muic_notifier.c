@@ -392,12 +392,12 @@ static int __init muic_notifier_init(void)
 
 	pr_info("%s\n", __func__);
 
-	switch_device = sec_device_create(0, NULL, "switch");
-	if (IS_ERR(switch_device)) {
-		pr_err("(%s): failed to created device (switch_device)!\n",
-				__func__);
-		return -ENODEV;
-	}
+	//switch_device = sec_device_create(0, NULL, "switch");
+	//if (IS_ERR(switch_device)) {
+	//	pr_err("(%s): failed to created device (switch_device)!\n",
+	//			__func__);
+	//	return -ENODEV;
+	//}
 #if defined(CONFIG_CCIC_S2MU004)
 	muic_uses_new_noti = 1;
 
