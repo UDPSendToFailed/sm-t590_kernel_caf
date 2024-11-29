@@ -2285,33 +2285,6 @@ config ARCH_HIBERNATION_POSSIBLE
 
 endmenu
 
-config TIMA_LKMAUTH
-       bool "Enable LKM authentication TIMA feature"
-       default n
-       help
-         TIMA authenticates loaded kernel modules. Disable it if you don't
-         want TIMA enabled.
-
-config TIMA_LKMAUTH_CODE_PROT
-       bool "Support kernel Module"
-       depends on MODULES
-       default n
-       help
-         When enabled, this feature will mark all Executable sections in an
-         LKM as RO
-
-config TIMA_TEST_INFRA
-       tristate "Testing infrastructure for TIMA"
-       default n
-       help
-         Kernel bits of the TIMA test infrastructure
-
-config TIMA_UEVENT
-       bool "Uevent message propagation for TIMA"
-       default n
-       help
-         Uevent messages for TIMA PKM/LKM
-
 source "net/Kconfig"
 
 source "drivers/Kconfig"

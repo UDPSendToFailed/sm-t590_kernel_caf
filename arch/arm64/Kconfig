@@ -1179,37 +1179,6 @@ config ARM64_ERRATUM_843419
 
 endmenu
 
-config TIMA_GET_QSEE_LOGS_USING_RDX
-	bool "Enable QSEE Log Extraction using RDX tool"
-	default n
-
-config TIMA_LKMAUTH
-       bool "Enable LKM authentication TIMA feature"
-       default n
-       help
-         TIMA authenticates loaded kernel modules. Disable it if you don't
-         want TIMA enabled.
-
-config TIMA_LKMAUTH_CODE_PROT
-       bool "Support kernel Module"
-       depends on MODULES
-       default n
-       help
-         When enabled, this feature will mark all Executable sections in an
-         LKM as RO
-
-config TIMA_TEST_INFRA
-       tristate "Testing infrastructure for TIMA"
-       default n
-       help
-         Kernel bits of the TIMA test infrastructure
-
-config TIMA_UEVENT
-       bool "Uevent message propagation for TIMA"
-       default n
-       help
-         Uevent messages for TIMA PKM/LKM
-
 config RELOCATABLE_KERNEL 
 	bool "set kernel to relocatable in both virtual and physical address"
 	default n 

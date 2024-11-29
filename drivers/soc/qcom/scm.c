@@ -652,10 +652,6 @@ static int allocate_extra_arg_buffer(struct scm_desc *desc, gfp_t flags)
 	return 0;
 }
 
-#ifdef CONFIG_TIMA_LKMAUTH
-pid_t pid_from_lkm = -1;
-#endif
-
 static int __scm_call2(u32 fn_id, struct scm_desc *desc, bool retry)
 {
 	const char * const proca_clients_names[] = {
@@ -701,11 +697,7 @@ static int __scm_call2(u32 fn_id, struct scm_desc *desc, bool retry)
 
 		trace_scm_call_start(x0, desc);
 
-#ifdef CONFIG_TIMA_LKMAUTH
-		if ((pid_from_lkm == current_thread_info()->task->pid) || call_from_proca) {
-#else
 		if (call_from_proca) {
-#endif
 			flush_cache_all();
 
 #if defined(CONFIG_ARCH_MSM8917) || defined(CONFIG_ARCH_MSM8937) ||  defined(CONFIG_ARCH_MSM8953)

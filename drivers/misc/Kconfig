@@ -376,18 +376,6 @@ config SENSORS_APDS990X
 	   To compile this driver as a module, choose M here: the
 	   module will be called apds990x. If unsure, say N here.
 
-config TIMA_LOG
-	tristate "Support for dumping TIMA log"
-	default n
-	help
-	  This option enables support for dumping TIMA log
-
-config TIMA_TEST
-	tristate "Tima Test Suite"
-	default n
-	help
-	  This option enables kernel component of tima test suite
-
 config APDS9930
 	 tristate "Avago APDS9930 combined als and proximity sensors"
 	 depends on I2C

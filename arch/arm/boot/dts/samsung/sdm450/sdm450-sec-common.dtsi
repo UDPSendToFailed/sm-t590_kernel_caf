@@ -65,13 +65,6 @@
 			reg = <0x0 0x82800000 0x0 0x2800000>;
 		};
 
-		/*to reserve 2MB for TIMA */
-		tima_mem: tima_region@0x85B00000 {
-		    compatible = "removed-dma-pool";
-		    no-map;
-		    reg = <0 0x85B00000 0 0x200000>;
-		};
-
 		modem_shared_mem: modem_shared_mem_region@0x93000000 {
 			compatible = "removed-dma-pool";
 			no-map;

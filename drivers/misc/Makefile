@@ -76,10 +76,5 @@ obj-$(CONFIG_BATTERY_SAVER)	+= battery_saver.o
 obj-$(CONFIG_SAMSUNG_JACK)	+= sec_jack.o
 obj-$(CONFIG_SEC_MPP_SHARE)	+= sec_mux_sel.o
 
-ifeq ($(TIMA_ENABLED),1)
-obj-$(CONFIG_TIMA)		+= tima_debug_test.o
-obj-$(CONFIG_TIMA_LOG)		+= tima_debug_log.o
-endif
-
 # for dev-ril-bridge
 obj-$(CONFIG_DEV_RIL_BRIDGE)	+= dev_ril_bridge/
