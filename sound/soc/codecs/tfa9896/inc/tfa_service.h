@@ -37,6 +37,8 @@ extern "C" {
   #define TFA98XX_API_REV_STR "v4.2.0-Oct.27,2017"
 #endif
 
+#include "tfa9912_tfafieldnames.h"
+
 /* log */
 extern int tfa98xx_log_revision;
 extern int tfa98xx_log_subrevision;
@@ -1161,19 +1163,19 @@ int tfa_cf_enabled(tfa98xx_handle_t handle);
 /*
  * interrupt bit function to clear
  */
-int tfa_irq_clear(tfa98xx_handle_t handle, int bit);
+int tfa_irq_clear(tfa98xx_handle_t handle, enum tfa9912_irq bit);
 /*
  * return state of irq or -1 if illegal bit
  */
-int tfa_irq_get(tfa98xx_handle_t handle, int bit);
+int tfa_irq_get(tfa98xx_handle_t handle, enum tfa9912_irq bit);
 /*
  * interrupt bit function that operates on the shadow regs in the handle
  */
-int tfa_irq_ena(tfa98xx_handle_t handle, int bit, int state);
+int tfa_irq_ena(tfa98xx_handle_t handle, enum tfa9912_irq bit, int state);
 /*
  * interrupt bit function that sets the polarity
  */
-int tfa_irq_set_pol(tfa98xx_handle_t handle, int bit, int state);
+int tfa_irq_set_pol(tfa98xx_handle_t handle, enum tfa9912_irq bit, int state);
 /*
  * update dirty cached regs to i2c registers
  */
