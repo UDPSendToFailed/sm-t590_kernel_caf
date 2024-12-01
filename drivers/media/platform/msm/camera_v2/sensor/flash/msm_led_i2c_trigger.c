@@ -25,8 +25,13 @@
 #define CAM_FLASH_PINCTRL_STATE_SLEEP "cam_flash_suspend"
 #define CAM_FLASH_PINCTRL_STATE_DEFAULT "cam_flash_default"
 /*#define CONFIG_MSMB_CAMERA_DEBUG*/
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static void *g_fctrl;
 int32_t msm_led_i2c_trigger_get_subdev_id(struct msm_led_flash_ctrl_t *fctrl,

@@ -18,10 +18,15 @@
 #include "msm_cci.h"
 #include "msm_eeprom.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #define CDBG_V(fmt, args...) pr_debug(fmt, ##args)
-
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#define CDBG_V(fmt, args...) do { } while (0)
+#endif
 
 DEFINE_MSM_MUTEX(msm_eeprom_mutex);
 #ifdef CONFIG_COMPAT

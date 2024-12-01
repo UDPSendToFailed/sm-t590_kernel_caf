@@ -66,8 +66,13 @@ int msm_fled_flash_on_set_current_default(ext_pmic_flash_ctrl_t *flash_ctrl)
 }
 #endif
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 DEFINE_MSM_MUTEX(msm_flash_mutex);
 

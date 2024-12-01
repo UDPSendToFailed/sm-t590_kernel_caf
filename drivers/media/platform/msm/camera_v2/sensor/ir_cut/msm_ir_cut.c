@@ -18,8 +18,13 @@
 #include "msm_ir_cut.h"
 #include "msm_camera_dt_util.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 DEFINE_MSM_MUTEX(msm_ir_cut_mutex);
 

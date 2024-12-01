@@ -24,7 +24,7 @@ DEFINE_MSM_MUTEX(msm_ois_mutex);
 #ifdef MSM_OIS_DEBUG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #else
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) do { } while (0)
 #endif
 
 static struct v4l2_file_operations msm_ois_v4l2_subdev_fops;

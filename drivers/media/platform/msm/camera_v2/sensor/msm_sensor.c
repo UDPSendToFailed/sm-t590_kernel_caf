@@ -41,8 +41,13 @@ uint32_t sec_sensor_clk_size;
 static struct cam_hw_param_collector cam_hwparam_collector;
 #endif
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static struct msm_camera_i2c_fn_t msm_sensor_cci_func_tbl;
 static struct msm_camera_i2c_fn_t msm_sensor_secure_func_tbl;

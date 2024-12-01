@@ -64,8 +64,13 @@
 #define MAX_LANE_COUNT 4
 #define CSID_TIMEOUT msecs_to_jiffies(100)
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static struct camera_vreg_t csid_vreg_info[] = {
 	{"qcom,mipi-csi-vdd", 0, 0, 12000},

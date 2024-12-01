@@ -16,8 +16,13 @@
 
 #define FLASH_NAME "qcom,led-flash"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static struct msm_led_flash_ctrl_t fctrl;
 static struct i2c_driver adp1660_i2c_driver;

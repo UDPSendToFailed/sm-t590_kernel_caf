@@ -25,8 +25,13 @@
 #include "cam_soc_api.h"
 #include "msm_isp48.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 #define VFE47_8996V1_VERSION   0x70000000
 

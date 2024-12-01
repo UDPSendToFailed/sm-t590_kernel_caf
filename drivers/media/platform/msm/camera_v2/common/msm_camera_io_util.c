@@ -23,8 +23,13 @@
 
 #define BUFF_SIZE_128 128
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 void msm_camera_io_w(u32 data, void __iomem *addr)
 {

@@ -27,13 +27,13 @@
 #include "s5k5e3yx_otp.h"
 #endif
 
-#define MSM_EEPROM_DEBUG 1
+#define MSM_EEPROM_DEBUG 0
 
 #undef CDBG
 #ifdef MSM_EEPROM_DEBUG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #else
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) do { } while (0)
 #endif
 
 #undef EEPROM_MMAP_DEBUG

@@ -15,8 +15,13 @@
 
 #include "msm_led_flash.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static struct v4l2_file_operations msm_led_flash_v4l2_subdev_fops;
 

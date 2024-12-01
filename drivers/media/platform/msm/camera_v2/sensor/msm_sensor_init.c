@@ -24,8 +24,13 @@
 #endif
 
 /* Logging macro */
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 extern struct kset *devices_kset;
 static struct msm_sensor_init_t *s_init;

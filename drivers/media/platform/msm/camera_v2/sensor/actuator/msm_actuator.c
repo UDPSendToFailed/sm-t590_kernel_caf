@@ -26,7 +26,7 @@ DEFINE_MSM_MUTEX(msm_actuator_mutex);
 #ifdef MSM_ACTUATOR_DEBUG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #else
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) do { } while (0)
 #endif
 #define CONFIG_J8PLUS_ACTUATOR
 

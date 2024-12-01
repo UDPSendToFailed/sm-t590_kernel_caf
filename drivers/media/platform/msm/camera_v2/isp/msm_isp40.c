@@ -22,8 +22,13 @@
 #include "msm_camera_io_util.h"
 #include "msm_isp47.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 #define VFE40_BURST_LEN 1
 #define VFE40_BURST_LEN_8916_VERSION 2

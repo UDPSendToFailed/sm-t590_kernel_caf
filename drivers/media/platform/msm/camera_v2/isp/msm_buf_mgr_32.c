@@ -34,8 +34,13 @@
 #include "msm.h"
 #include "msm_buf_mgr_32.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 struct msm_isp_bufq *msm_isp_get_bufq(
 	struct msm_isp_buf_mgr *buf_mgr,

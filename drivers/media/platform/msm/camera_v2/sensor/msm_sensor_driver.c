@@ -19,8 +19,13 @@
 #include "msm_sensor_init.h"
 
 /* Logging macro */
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 #define SENSOR_MAX_MOUNTANGLE (360)
 

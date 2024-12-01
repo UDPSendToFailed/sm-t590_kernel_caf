@@ -14,9 +14,15 @@
 #include "msm_camera_i2c.h"
 #include "msm_cci.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 #define S_I2C_DBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#define S_I2C_DBG(fmt, args...) do { } while (0)
+#endif
 
 int32_t msm_camera_cci_i2c_read(struct msm_camera_i2c_client *client,
 	uint32_t addr, uint16_t *data,

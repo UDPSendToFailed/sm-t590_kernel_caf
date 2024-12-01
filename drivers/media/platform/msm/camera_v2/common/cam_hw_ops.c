@@ -23,7 +23,7 @@
 #ifdef CONFIG_CAM_AHB_DBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #else
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) do { } while (0)
 #endif
 
 struct cam_ahb_client {

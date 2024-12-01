@@ -32,8 +32,13 @@
 #include "cam_smmu_api.h"
 #include "msm_isp_util.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 #define BUF_DEBUG_FULL 0
 #define MAX_LIST_COUNT 100

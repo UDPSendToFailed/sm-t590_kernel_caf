@@ -50,8 +50,13 @@
 #define CLOCK_OFFSET                              0x700
 #define CSIPHY_SOF_DEBUG_COUNT                      2
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static struct v4l2_file_operations msm_csiphy_v4l2_subdev_fops;
 

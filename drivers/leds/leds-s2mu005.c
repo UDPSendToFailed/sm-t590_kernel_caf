@@ -32,8 +32,13 @@
 #define FLED_PINCTRL_STATE_DEFAULT "fled_default"
 #define FLED_PINCTRL_STATE_SLEEP "fled_sleep"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 extern struct class *camera_class;
 struct device *flash_dev;

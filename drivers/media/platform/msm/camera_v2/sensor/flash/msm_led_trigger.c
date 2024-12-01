@@ -18,8 +18,13 @@
 
 #define FLASH_NAME "camera-led-flash"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 static enum flash_type flashtype;
 static struct msm_led_flash_ctrl_t fctrl;

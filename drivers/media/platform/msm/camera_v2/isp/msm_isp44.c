@@ -22,8 +22,13 @@
 #include "msm_camera_io_util.h"
 #include "msm_isp47.h"
 
+#ifdef CONFIG_MSM_CAMERA_DEBUG
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#else
+#undef CDBG
+#define CDBG(fmt, args...) do { } while (0)
+#endif
 
 #define STATS_IDX_BF_SCALE  0
 #define STATS_IDX_BE        1
