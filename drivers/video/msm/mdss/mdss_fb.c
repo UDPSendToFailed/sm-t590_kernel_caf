@@ -3076,8 +3076,10 @@ static int __mdss_fb_wait_for_fence_sub(struct msm_sync_pt_data *sync_pt_data,
 #if defined(CONFIG_FB_MSM_MDSS_SAMSUNG)
 		if (ret == -ETIME) {
 
+#ifdef CONFIG_SYNC_DEBUG
 			pr_warn("%s: sync_fence_wait timed out! ",
 					fences[i]->name);
+#endif
 			pr_cont("Waiting %ld.%ld more seconds\n",
 				(wait_ms/MSEC_PER_SEC), (wait_ms%MSEC_PER_SEC));
 
