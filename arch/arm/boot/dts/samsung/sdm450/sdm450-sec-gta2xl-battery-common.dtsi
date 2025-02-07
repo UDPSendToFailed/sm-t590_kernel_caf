@@ -98,7 +98,7 @@
 		battery,batt_data_version = <2>;
 		battery,chip_vendor = "QCOM";
 
-		battery,polling_time = <10 30 30 30 3600>;
+		battery,polling_time = <1 1 1 1 3600>;
 		battery,polling_type = <1>; /* SEC_BATTERY_MONITOR_ALARM */
 
 		battery,temp_adc_type = <1>; /* SEC_BATTERY_ADC_TYPE_AP */
