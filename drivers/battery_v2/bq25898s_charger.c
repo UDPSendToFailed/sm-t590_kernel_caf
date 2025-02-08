@@ -9,7 +9,6 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  */
-#define DEBUG
 
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
@@ -35,7 +34,7 @@ int bq25898s_read_reg(struct i2c_client *i2c, u8 reg, u8 *dest)
 	ret = i2c_smbus_read_byte_data(i2c, reg);
 	mutex_unlock(&bq25898s->i2c_lock);
 	if (ret < 0) {
-		pr_info("%s reg(0x%x), ret(%d)\n", __func__, reg, ret);
+		pr_debug("%s reg(0x%x), ret(%d)\n", __func__, reg, ret);
 		return ret;
 	}
 
@@ -53,7 +52,7 @@ int bq25898s_write_reg(struct i2c_client *i2c, u8 reg, u8 value)
 	ret = i2c_smbus_write_byte_data(i2c, reg, value);
 	mutex_unlock(&bq25898s->i2c_lock);
 	if (ret < 0)
-		pr_info("%s reg(0x%x), ret(%d)\n",
+		pr_debug("%s reg(0x%x), ret(%d)\n",
 				__func__, reg, ret);
 
 	return ret;
@@ -83,9 +82,8 @@ static void bq25898s_test_read(struct bq25898s_charger *charger)
 
 	for (reg = 0x00; reg <= 0x14; reg++) {
 		bq25898s_read_reg(charger->i2c, reg, &reg_data);
-		sprintf(str + strlen(str), "0x%02x:0x%02x,", reg, reg_data);
 	}
-	pr_info("%s : %s\n", __func__, str);
+	pr_debug("%s : %s\n", __func__, str);
 
 }
 
@@ -96,7 +94,7 @@ static int bq25898s_get_charge_current(struct bq25898s_charger *charger)
 
 	bq25898s_read_reg(charger->i2c, BQ25898S_CHG_REG_04, &data);
 	charge_current = (data & 0x3F) * 64;
-	pr_info("%s : DATA(0x%02x), current(%d)\n", __func__, data, charge_current);
+	pr_debug("%s : DATA(0x%02x), current(%d)\n", __func__, data, charge_current);
 	return charge_current;
 }
 
@@ -107,7 +105,7 @@ static int bq25898s_get_float_voltage(struct bq25898s_charger *charger)
 
 	bq25898s_read_reg(charger->i2c, BQ25898S_CHG_REG_06, &data);
 	max_voltage = (data >> 2) * 16 * 10 + 38400;
-	pr_info("%s : DATA(0x%02x) VOLTAGE(%d)\n", __func__, data, max_voltage);
+	pr_debug("%s : DATA(0x%02x) VOLTAGE(%d)\n", __func__, data, max_voltage);
 
 	return max_voltage;
 }
@@ -119,7 +117,7 @@ static int bq25898s_get_input_current(struct bq25898s_charger *charger)
 
 	bq25898s_read_reg(charger->i2c, BQ25898S_CHG_REG_00, &data);
 	input_current = (data & 0x3F) * 50 + 100;
-	pr_info("%s : DATA(0x%02x), current(%d)\n", __func__, data, input_current);
+	pr_debug("%s : DATA(0x%02x), current(%d)\n", __func__, data, input_current);
 
 	return input_current;
 }
@@ -129,7 +127,7 @@ static void bq25898s_set_charge_current(struct bq25898s_charger *charger, int ch
 	u8 data;
 
 	data = charging_current / 64;
-	pr_info("%s: charging_current(%d), 0x%x \n", __func__, charging_current, data);
+	pr_debug("%s: charging_current(%d), 0x%x \n", __func__, charging_current, data);
 
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_04,
 			data, BQ25898S_CHG_ICHG_MASK);
@@ -144,7 +142,7 @@ static void bq25898s_set_input_current(struct bq25898s_charger *charger, int inp
 	else
 		data = (input_current - 100) / 50;
 
-	pr_info ("%s : SET INPUT CURRENT(%d), 0x%x\n", __func__, input_current, data);
+	pr_debug ("%s : SET INPUT CURRENT(%d), 0x%x\n", __func__, input_current, data);
 
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_00,
 			data, BQ25898S_CHG_IINLIM_MASK);
@@ -156,7 +154,7 @@ static void bq25898s_watchdog_reset(struct bq25898s_charger *charger)
 
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_03, 0x40, 0x40);
 	bq25898s_read_reg(charger->i2c, BQ25898S_CHG_REG_03, &data);
-	pr_info("%s : BQ25898S_CHG_REG_03(0x%02x)\n", __func__, data);
+	pr_debug("%s : BQ25898S_CHG_REG_03(0x%02x)\n", __func__, data);
 }
 
 static void bq25898s_set_watchdog_timer_en(struct bq25898s_charger *charger, int time)
@@ -170,7 +168,7 @@ static void bq25898s_set_float_voltage(struct bq25898s_charger *charger, int flo
 	u8 data;
 
 	data = ((float_voltage - 38400) / 10 / 16) << 2;
-	pr_info("%s: voltage(%d), 0x%x \n", __func__, float_voltage, data);
+	pr_debug("%s: voltage(%d), 0x%x \n", __func__, float_voltage, data);
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_06,
 			data, BQ25898S_CHG_VREG_MASK);
 }
@@ -178,7 +176,7 @@ static void bq25898s_set_float_voltage(struct bq25898s_charger *charger, int flo
 static void bq25898s_set_charger_state(struct bq25898s_charger *charger,
 	int enable)
 {
-	pr_info("%s: CHARGE_EN(%s)\n",__func__, enable > 0 ? "ENABLE" : "DISABLE");
+	pr_debug("%s: CHARGE_EN(%s)\n",__func__, enable > 0 ? "ENABLE" : "DISABLE");
 
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_03,
 			(enable << BQ25898S_CHG_CONFIG_SHIFT), BQ25898S_CHG_CONFIG_MASK);
@@ -191,7 +189,7 @@ static void bq25898s_set_topoff_current(struct bq25898s_charger *charger, int eo
 	u8 data;
 
 	data = (eoc - 64) / 64;
-	pr_info("%s: eoc(%d), 0x%x \n", __func__, eoc, data);
+	pr_debug("%s: eoc(%d), 0x%x \n", __func__, eoc, data);
 	bq25898s_update_reg(charger->i2c, BQ25898S_CHG_REG_05,
 		data, BQ25898S_CHG_ITERM_MASK);
 }
@@ -216,7 +214,7 @@ static irqreturn_t bq25898s_irq_handler(int irq, void *data)
 	u8 val;
 
 	bq25898s_read_reg(charger->i2c, BQ25898S_CHG_REG_0C, &val);
-	dev_info(charger->dev,
+	dev_dbg(charger->dev,
 			"%s: 0x%x\n", __func__, val);
 
 	return IRQ_HANDLED;
@@ -274,7 +272,7 @@ static int bq25898s_chg_get_property(struct power_supply *psy,
 					val->intval = 1;
 				else
 					val->intval = 0;
-				pr_info("%s: reg_data : 0x%02X\n", __func__,reg_data);
+				pr_debug("%s: reg_data : 0x%02X\n", __func__,reg_data);
 			}
 			break;
 		case POWER_SUPPLY_EXT_PROP_CHECK_MULTI_CHARGE:
@@ -392,7 +390,7 @@ static ssize_t bq25898s_store_data(struct device *dev,
 		u8 data = x;
 		if (bq25898s_write_reg(charger->i2c, charger->addr, data) < 0)
 		{
-			dev_info(charger->dev,
+			dev_dbg(charger->dev,
 					"%s: addr: 0x%x write fail\n", __func__, charger->addr);
 		}
 	}
@@ -412,7 +410,7 @@ static ssize_t bq25898s_show_data(struct device *dev,
 
 	for (i = 0; i <= charger->size; i++) {
 		if (bq25898s_read_reg(charger->i2c, charger->addr+i, &data) < 0) {
-			dev_info(charger->dev,
+			dev_dbg(charger->dev,
 					"%s: read fail\n", __func__);
 			count += sprintf(buf+count, "addr: 0x%x read fail\n", charger->addr+i);
 			continue;
@@ -454,13 +452,13 @@ static int bq25898s_charger_parse_dt(struct bq25898s_charger *charger,
 			pdata->irq_gpio = 0;
 		} else {
 			pdata->irq_gpio = ret;
-			pr_info("%s: irq-gpio = %d\n", __func__, pdata->irq_gpio);
+			pr_debug("%s: irq-gpio = %d\n", __func__, pdata->irq_gpio);
 		}
 
 		ret = of_property_read_u32(np, "bq25898s-charger,chg_float_voltage",
 					   &pdata->float_voltage);
 		if (ret) {
-			pr_info("%s: bq25898s-charger,chg_float_voltage is empty\n", __func__);
+			pr_debug("%s: bq25898s-charger,chg_float_voltage is empty\n", __func__);
 			charger->float_voltage  = 43000;
 		} else
 			charger->float_voltage = pdata->float_voltage;
@@ -468,7 +466,7 @@ static int bq25898s_charger_parse_dt(struct bq25898s_charger *charger,
 		ret = of_property_read_u32(np, "bq25898s-charger,full_check_current",
 					   &pdata->full_check_current);
 		if (ret) {
-			pr_info("%s: bq25898s-charger,full_check_current is empty\n", __func__);
+			pr_debug("%s: bq25898s-charger,full_check_current is empty\n", __func__);
 			charger->full_check_current  = 128;
 		} else
 			charger->full_check_current = pdata->full_check_current;
@@ -486,7 +484,7 @@ static int bq25898s_charger_probe(struct i2c_client *client,
 
 	int ret = 0;
 
-	pr_info("%s: bq25898s Charger Driver Loading\n", __func__);
+	pr_debug("%s: bq25898s Charger Driver Loading\n", __func__);
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE))
 		return -EIO;
@@ -530,7 +528,7 @@ static int bq25898s_charger_probe(struct i2c_client *client,
 	bq25898s_charger_initialize(charger);
 	charger->input_current = bq25898s_get_input_current(charger);
 	charger->charging_current = bq25898s_get_charge_current(charger);
-	pr_info("%s: input: %d, charging: %d\n", __func__, charger->input_current, charger->charging_current);
+	pr_debug("%s: input: %d, charging: %d\n", __func__, charger->input_current, charger->charging_current);
 
 	ret = power_supply_register(charger->dev, &charger->psy_chg);
 	if (ret) {
@@ -553,11 +551,11 @@ static int bq25898s_charger_probe(struct i2c_client *client,
 
 	ret = sysfs_create_group(&charger->psy_chg.dev->kobj, &bq25898s_attr_group);
 	if (ret) {
-		dev_info(&client->dev,
+		dev_dbg(&client->dev,
 			"%s: sysfs_create_group failed\n", __func__);
 	}
 	charger->size = BQ25898S_CHG_REG_14;
-	pr_info("%s: bq25898s Charger Driver Loaded\n", __func__);
+	pr_debug("%s: bq25898s Charger Driver Loaded\n", __func__);
 
 	return 0;
 
@@ -593,7 +591,7 @@ static void bq25898s_charger_shutdown(struct i2c_client *client)
 
 	if (charger->chg_irq)
 		free_irq(charger->chg_irq, charger);
-	pr_info("%s: bq25898s Charger driver shutdown\n", __func__);
+	pr_debug("%s: bq25898s Charger driver shutdown\n", __func__);
 	if (!charger->i2c) {
 		pr_err("%s: no bq25898s i2c client\n", __func__);
 		return;
@@ -664,7 +662,7 @@ static struct i2c_driver bq25898s_charger_driver = {
 
 static int __init bq25898s_charger_init(void)
 {
-	pr_info("%s : \n", __func__);
+	pr_debug("%s : \n", __func__);
 	return i2c_add_driver(&bq25898s_charger_driver);
 }
 

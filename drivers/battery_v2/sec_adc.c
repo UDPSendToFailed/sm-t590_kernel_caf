@@ -15,8 +15,6 @@
 #include <linux/sec_mux_sel.h>
 #endif
 
-#define DEBUG
-
 static struct qpnp_vadc_chip *adc_client;
 
 struct adc_list {
@@ -100,7 +98,7 @@ static void sec_bat_adc_ap_init(struct platform_device *pdev,
 	}
 
 	for (j = 0; j < SEC_BAT_ADC_CHANNEL_NUM; j++) {
-		pr_info("%s %s[0x%x] - %s \n",
+		pr_debug("%s %s[0x%x] - %s \n",
 			__func__, batt_adc_list[j].name, batt_adc_list[j].channel,
 			batt_adc_list[j].is_used ? "used" : "not used");
 	}	
@@ -420,7 +418,7 @@ bool sec_bat_get_value_by_adc(
 temp_by_adc_goto:
 	value->intval = temp;
 
-	dev_info(battery->dev,
+	dev_dbg(battery->dev,
 		"%s:[%d] Temp(%d), Temp-ADC(%d)\n",
 		__func__, channel, temp, temp_adc);
 
@@ -445,7 +443,7 @@ bool sec_bat_check_vf_adc(struct sec_battery_info *battery)
 		(battery->check_adc_value >= battery->pdata->check_adc_min)) {
 		return true;
 	} else {
-		dev_info(battery->dev, "%s: adc (%d)\n", __func__, battery->check_adc_value);
+		dev_dbg(battery->dev, "%s: adc (%d)\n", __func__, battery->check_adc_value);
 		return false;
 	}
 }

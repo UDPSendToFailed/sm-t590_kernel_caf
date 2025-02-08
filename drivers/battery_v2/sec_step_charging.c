@@ -61,7 +61,7 @@ bool sec_bat_check_step_charging(struct sec_battery_info *battery)
 	}
 
 	if (i != battery->step_charging_status) {
-		pr_info("%s : prev=%d, new=%d, value=%d, current=%d\n", __func__,
+		pr_debug("%s : prev=%d, new=%d, value=%d, current=%d\n", __func__,
 			battery->step_charging_status, i, value, battery->pdata->step_charging_current[i]);
 		battery->pdata->charging_current[battery->cable_type].fast_charging_current = battery->pdata->step_charging_current[i];
 		battery->step_charging_status = i;
@@ -102,19 +102,19 @@ void sec_step_charging_init(struct sec_battery_info *battery, struct device *dev
 		ret = of_property_read_u32_array(np, "battery,step_charging_condtion",
 				pdata->step_charging_condition, len);
 		if (ret) {
-			pr_info("%s : step_charging_condtion read fail\n", __func__);
+			pr_debug("%s : step_charging_condtion read fail\n", __func__);
 			battery->step_charging_step = 0;
 		} else {
 			pdata->step_charging_current = kzalloc(sizeof(u32) * len, GFP_KERNEL);
 			ret = of_property_read_u32_array(np, "battery,step_charging_current",
 					pdata->step_charging_current, len);
 			if (ret) {
-				pr_info("%s : step_charging_current read fail\n", __func__);
+				pr_debug("%s : step_charging_current read fail\n", __func__);
 				battery->step_charging_step = 0;
 			} else {
 				battery->step_charging_status = -1;
 				for (i = 0; i < len; i++) {
-					pr_info("%s : step condition(%d), current(%d)\n",
+					pr_debug("%s : step condition(%d), current(%d)\n",
 					__func__, pdata->step_charging_condition[i],
 					pdata->step_charging_current[i]);
 				}

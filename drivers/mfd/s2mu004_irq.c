@@ -170,42 +170,42 @@ static irqreturn_t s2mu004_irq_thread(int irq, void *data)
 	/* CHG_INT1_MASK ~ INT2_MASK, 0x91 */
 	ret = s2mu004_read_reg(s2mu004->i2c, S2MU004_REG_SC_INT1_MASK,
 				&temp);
-	pr_info("%s: SC_INT1_MASK(0x%02x)\n", __func__, temp);
+	pr_debug("%s: SC_INT1_MASK(0x%02x)\n", __func__, temp);
 
 	ret = s2mu004_read_reg(s2mu004->i2c, S2MU004_REG_SC_INT2_MASK,
 				&temp);
-	pr_info("%s: SC_INT2_MASK(0x%02x)\n", __func__, temp);
+	pr_debug("%s: SC_INT2_MASK(0x%02x)\n", __func__, temp);
 
 	ret = s2mu004_read_reg(s2mu004->i2c, 0x91,
 				&temp);
-	pr_info("%s: 0x91(0x%02x)\n", __func__, temp);
+	pr_debug("%s: 0x91(0x%02x)\n", __func__, temp);
 
 	/* CHG_INT1 ~ INT2 */
 	ret = s2mu004_read_reg(s2mu004->i2c, S2MU004_REG_SC_INT1,
 				&irq_reg[CHG_INT1]);
-	pr_info("%s: charger interrupt(0x%02x)\n",
+	pr_debug("%s: charger interrupt(0x%02x)\n",
 			__func__, irq_reg[CHG_INT1]);
 
 	ret = s2mu004_read_reg(s2mu004->i2c, S2MU004_REG_SC_INT2,
 				&irq_reg[CHG_INT2]);
-	pr_info("%s: charger interrupt(0x%02x)\n",
+	pr_debug("%s: charger interrupt(0x%02x)\n",
 			__func__, irq_reg[CHG_INT2]);
 
 	/* AFC_INT */
 #if defined(CONFIG_MUIC_HV)
 	ret = s2mu004_read_reg(s2mu004->i2c, S2MU004_REG_AFC_INT,
 				&irq_reg[AFC_INT]);
-	pr_info("%s: AFC interrupt(0x%02x)\n",
+	pr_debug("%s: AFC interrupt(0x%02x)\n",
 			__func__, irq_reg[AFC_INT]);
 #endif
 	ret = s2mu004_read_reg(s2mu004->i2c, 0x48,
 				&temp_vdadc);
-	pr_info("%s: 0x48 (0x%02x)\n",
+	pr_debug("%s: 0x48 (0x%02x)\n",
 			__func__, temp_vdadc);
 	/* MUIC INT1 ~ INT2 */
 	ret = s2mu004_bulk_read(s2mu004->i2c, S2MU004_REG_MUIC_INT1,
 				S2MU004_NUM_IRQ_MUIC_REGS, &irq_reg[MUIC_INT1]);
-	pr_info("%s: muic interrupt(0x%02x, 0x%02x)\n", __func__,
+	pr_debug("%s: muic interrupt(0x%02x, 0x%02x)\n", __func__,
 			irq_reg[MUIC_INT1], irq_reg[MUIC_INT2]);
 
 	if (s2mu004->pmic_rev == 0) {
