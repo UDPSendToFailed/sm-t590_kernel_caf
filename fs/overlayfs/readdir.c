@@ -293,9 +293,6 @@ static int ovl_dir_mark_whiteouts(struct dentry *dir,
 
 	mutex_lock(&dir->d_inode->i_mutex);
 	list_for_each_entry(p, rdd->list, l_node) {
-		if (p->is_cursor)
-			continue;
-
 		if (p->type != DT_CHR)
 			continue;
 
