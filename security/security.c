@@ -518,13 +518,11 @@ int security_inode_create(struct inode *dir, struct dentry *dentry, umode_t mode
 EXPORT_SYMBOL_GPL(security_inode_create);
 
 int security_inode_post_create(struct inode *dir, struct dentry *dentry,
-			       umode_t mode)
+	umode_t mode)
 {
 	if (unlikely(IS_PRIVATE(dir)))
 		return 0;
-	if (security_ops->inode_post_create == NULL)
-		return 0;
-	return security_ops->inode_post_create(dir, dentry, mode);
+	return call_int_hook(inode_post_create, 0, dir, dentry, mode);
 }
 
 int security_inode_link(struct dentry *old_dentry, struct inode *dir,
@@ -860,12 +858,7 @@ int security_file_open(struct file *file, const struct cred *cred)
 
 bool security_allow_merge_bio(struct bio *bio1, struct bio *bio2)
 {
-	bool ret = pfk_allow_merge_bio(bio1, bio2);
-
-	if (security_ops->allow_merge_bio)
-		ret = ret && security_ops->allow_merge_bio(bio1, bio2);
-
-	return ret;
+	return pfk_allow_merge_bio(bio1, bio2);
 }
 
 int security_task_create(unsigned long clone_flags)
@@ -1637,6 +1630,7 @@ struct security_hook_heads security_hook_heads = {
 	.inode_init_security =
 		LIST_HEAD_INIT(security_hook_heads.inode_init_security),
 	.inode_create =	LIST_HEAD_INIT(security_hook_heads.inode_create),
+	.inode_post_create = LIST_HEAD_INIT(security_hook_heads.inode_post_create),
 	.inode_link =	LIST_HEAD_INIT(security_hook_heads.inode_link),
 	.inode_unlink =	LIST_HEAD_INIT(security_hook_heads.inode_unlink),
 	.inode_symlink =

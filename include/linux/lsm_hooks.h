@@ -1666,6 +1666,7 @@ struct security_hook_heads {
 	struct list_head inode_free_security;
 	struct list_head inode_init_security;
 	struct list_head inode_create;
+	struct list_head inode_post_create;
 	struct list_head inode_link;
 	struct list_head inode_unlink;
 	struct list_head inode_symlink;
