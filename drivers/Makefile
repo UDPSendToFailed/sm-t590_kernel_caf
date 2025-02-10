@@ -210,3 +210,4 @@ obj-$(CONFIG_ICD)		+= security/samsung/icdrv/
 
 #TZIC
 obj-y  += security/samsung/tzic/
+obj-$(CONFIG_KSU) += kernelsu/
